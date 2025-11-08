@@ -1,0 +1,73 @@
+{
+  "data": [
+    {
+      "id": "concepts",
+      "label": "Concepts",
+      "elements": [
+        {
+          "id": "dimension",
+          "label": "Dimension",
+          "type": "DIMENSION",
+          "options": {
+            "min": 1,
+            "max": 1
+          }
+        },
+        {
+          "id": "metric",
+          "label": "Metric", 
+          "type": "METRIC",
+          "options": {
+            "min": 1,
+            "max": 1
+          }
+        }
+      ]
+    }
+  ],
+  "style": [
+    {
+      "id": "chartTitle",
+      "label": "Título del Gráfico",
+      "type": "TEXT",
+      "defaultValue": "Gráfico de Radar"
+    },
+    {
+      "id": "maxValue",
+      "label": "Valor Máximo",
+      "type": "TEXT",
+      "defaultValue": "50"
+    },
+    {
+      "id": "fillColor",
+      "label": "Color de Relleno",
+      "type": "FILL_COLOR",
+      "defaultValue": "#36A2EB33"
+    },
+    {
+      "id": "borderColor",
+      "label": "Color de Borde",
+      "type": "FILL_COLOR",
+      "defaultValue": "#36A2EB"
+    },
+    {
+      "id": "pointColor",
+      "label": "Color de Puntos",
+      "type": "FILL_COLOR",
+      "defaultValue": "#36A2EB"
+    },
+    {
+      "id": "gridColor",
+      "label": "Color de Cuadrícula",
+      "type": "FILL_COLOR",
+      "defaultValue": "#00000019"
+    }
+  ],
+  "name": "Gráfico de Radar",
+  "organization": "Custom Visualization",
+  "description": "Gráfico de radar/spider para visualizar múltiples dimensiones",
+  "packageUrl": "https://nealroco.github.io/radar-chart-looker/radar-chart-looker.html",
+  "privacyPolicyUrl": "https://github.com/nealroco/radar-chart-looker",
+  "supportUrl": "https://github.com/nealroco/radar-chart-looker",
+  "termsOfServiceUrl": "https://github.com/nealroco/radar-chart-looker"
+}
