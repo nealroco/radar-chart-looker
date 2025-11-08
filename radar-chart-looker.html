@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radar Chart for Looker Studio</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      overflow: hidden;
+    }
+    #chartContainer {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #myChart {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #title {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="title"></div>
+  <div id="chartContainer">
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    // Looker Studio Community Visualization API
+    var dscc = window.dscc || {};
+    var LOCAL = !dscc.isDev;
+
+    // Function to draw the chart
+    function drawViz(data) {
+      try {
+        // Extract configuration
+        var styleConfig = data.style;
+        var dataConfig = data.tables.DEFAULT;
+        
+        // Get title from style or use default
+        var chartTitle = styleConfig.chartTitle ? styleConfig.chartTitle.value : '';
+        document.getElementById('title').textContent = chartTitle;
+
+        // Extract dimensions (labels) and metrics (values)
+        var labels = [];
+        var values = [];
+        
+        dataConfig.forEach(function(row) {
+          // First column is dimension (label)
+          labels.push(row[0]);
+          // Second column is metric (value)
+          values.push(parseFloat(row[1]) || 0);
+        });
+
+        // Get colors from style config or use defaults
+        var fillColor = styleConfig.fillColor ? styleConfig.fillColor.value.color : 'rgba(54, 162, 235, 0.2)';
+        var borderColor = styleConfig.borderColor ? styleConfig.borderColor.value.color : 'rgb(54, 162, 235)';
+        var pointColor = styleConfig.pointColor ? styleConfig.pointColor.value.color : 'rgb(54, 162, 235)';
+        var gridColor = styleConfig.gridColor ? styleConfig.gridColor.value.color : 'rgba(0, 0, 0, 0.1)';
+        
+        // Get max value or calculate it
+        var maxValue = styleConfig.maxValue ? parseFloat(styleConfig.maxValue.value) : Math.max(...values) * 1.2;
+        
+        // Create or update chart
+        var ctx = document.getElementById('myChart').getContext('2d');
+        
+        if (window.myRadarChart) {
+          window.myRadarChart.destroy();
+        }
+
+        window.myRadarChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: chartTitle || 'Valores',
+              data: values,
+              fill: true,
+              backgroundColor: fillColor,
+              borderColor: borderColor,
+              pointBackgroundColor: pointColor,
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: borderColor,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              borderWidth: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              r: {
+                angleLines: {
+                  display: true,
+                  color: gridColor
+                },
+                grid: {
+                  color: gridColor,
+                  circular: true
+                },
+                pointLabels: {
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  },
+                  color: '#333'
+                },
+                suggestedMin: 0,
+                suggestedMax: maxValue,
+                ticks: {
+                  stepSize: maxValue / 5,
+                  font: {
+                    size: 12
+                  },
+                  backdropColor: 'rgba(255, 255, 255, 0.75)'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.parsed.r.toFixed(1);
+                  }
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error drawing chart:', error);
+        document.body.innerHTML = '<div style="padding: 20px; color: red;">Error: ' + error.message + '</div>';
+      }
+    }
+
+    // Subscribe to data changes
+    if (dscc.subscribeToData) {
+      dscc.subscribeToData(drawViz, {transform: dscc.objectTransform});
+    } else {
+      // Local testing data
+      drawViz({
+        style: {
+          chartTitle: {value: 'GRADO 6° - Promedio: 32.9'},
+          maxValue: {value: 50},
+          fillColor: {value: {color: 'rgba(54, 162, 235, 0.2)'}},
+          borderColor: {value: {color: 'rgb(54, 162, 235)'}},
+          pointColor: {value: {color: 'rgb(54, 162, 235)'}},
+          gridColor: {value: {color: 'rgba(0, 0, 0, 0.1)'}}
+        },
+        tables: {
+          DEFAULT: [
+            ['Castellano', 35],
+            ['Emprendimiento', 30],
+            ['Religión', 25],
+            ['Tecnología', 20],
+            ['Inglés', 38],
+            ['Ética y Valores', 40],
+            ['Ed. Física', 42],
+            ['Ed. Artística', 35],
+            ['C. Sociales', 30],
+            ['C. Naturales', 28],
+            ['Agroambiental', 32],
+            ['Matemáticas', 33]
+          ]
+        }
+      });
+    }
+  </script>
+</body>
+</html>
